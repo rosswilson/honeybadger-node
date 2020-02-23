@@ -1,7 +1,8 @@
 const backend = require("./backend");
+const logger = require("./logger");
 
 const defaultOptions = {
-  endpoint: "https://api.honeybadger.io"
+  baseUrl: "https://api.honeybadger.io"
 };
 
 function initialise(overrideOptions = {}) {
@@ -22,11 +23,13 @@ async function notify(error, context) {
   };
 
   try {
-    await backend.deliver(this.options, payload);
+    const result = await backend.deliver(this.options, payload);
 
-    console.log("Successfully reported error to Honeybadger");
+    logger.debug(result);
+
+    logger.info("Successfully reported error to Honeybadger");
   } catch (error) {
-    console.error("Unable to report error to Honeybadger", error);
+    logger.error("Unable to report error to Honeybadger", error);
   }
 }
 
