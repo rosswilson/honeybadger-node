@@ -17,6 +17,12 @@ describe("index", () => {
   });
 
   it("should submit notices to the API as expected", async () => {
+    const fakeError = new Error("Some fake error");
+
+    const fakeContext = {
+      someKey: "someValue"
+    };
+
     const endpointScope = nock("https://api.honeybadger.io", {
       reqheaders: {
         Accept: "application/json",
@@ -25,7 +31,8 @@ describe("index", () => {
       }
     })
       .post("/v1/notices", {
-        error: "Error: Some fake error"
+        error: "Error: Some fake error",
+        context: fakeContext
       })
       .reply(200, {
         status: "ok"
@@ -33,9 +40,7 @@ describe("index", () => {
 
     const { notify } = createReporter(givenOptions);
 
-    const fakeError = new Error("Some fake error");
-
-    await notify(fakeError);
+    await notify(fakeError, fakeContext);
 
     expect(endpointScope.isDone()).toBeTruthy();
   });
