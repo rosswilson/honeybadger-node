@@ -1,8 +1,10 @@
 const backend = require("./backend");
 const logger = require("./logger");
+const { version } = require("../package.json");
 
 const defaultOptions = {
-  baseUrl: "https://api.honeybadger.io"
+  baseUrl: "https://api.honeybadger.io",
+  serverContext: {}
 };
 
 function initialise(overrideOptions = {}) {
@@ -16,10 +18,16 @@ function initialise(overrideOptions = {}) {
   };
 }
 
-async function notify(error, context) {
+async function notify(error, requestContext) {
   const payload = {
+    notifier: {
+      name: "Ross Wilson's Honeybadger Notifier",
+      url: "https://github.com/rosswilson/honeybadger-node",
+      version
+    },
     error: error.toString(),
-    context
+    request: requestContext,
+    server: this.options.serverContext
   };
 
   try {
