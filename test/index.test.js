@@ -37,7 +37,7 @@ describe("index", () => {
         error: "Error: Some fake error",
         context: fakeContext
       })
-      .reply(200, {
+      .reply(201, {
         id: "a75ff7b5-f79a-4ecf-a7bb-1544524d0c18"
       });
 
