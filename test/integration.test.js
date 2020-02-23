@@ -1,6 +1,5 @@
+const nock = require("nock");
 const createReporter = require("../src/index");
-const backend = require("../src/backend");
-const logger = require("../src/logger");
 const stacktrace = require("../src/stacktrace");
 
 jest.mock(
@@ -11,11 +10,9 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock("../src/logger");
-jest.mock("../src/backend");
 jest.mock("../src/stacktrace");
 
-describe("index", () => {
+describe("integration", () => {
   const givenApiKey = "someApiKey";
 
   const givenServerContext = {
@@ -53,60 +50,42 @@ describe("index", () => {
 
   stacktrace.build.mockReturnValue(fakeStackTrace);
 
-  it("should return an object with a expected functions", () => {
-    const reporter = createReporter(givenOptions);
-
-    expect(reporter).toEqual({
-      notify: expect.any(Function)
-    });
-  });
-
-  it.only("should call the backend deliver function as expected", async () => {
-    const { notify } = createReporter(givenOptions);
-
+  it("should submit notices to the API as expected", async () => {
     const fakeError = new Error("Some fake error");
 
-    const givenRequestContext = {
+    const fakeRequestContext = {
       someKey: "someValue"
     };
 
-    await notify(fakeError, givenRequestContext);
-
-    expect(backend.deliver).toHaveBeenCalledWith(
-      {
-        apiKey: givenApiKey,
-        baseUrl: "https://api.honeybadger.io",
-        serverContext: givenServerContext
-      },
-      {
+    const endpointScope = nock("https://api.honeybadger.io", {
+      reqheaders: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-API-Key": givenApiKey
+      }
+    })
+      .post("/v1/notices", {
         notifier: {
           name: "Ross Wilson's Honeybadger Notifier",
           url: "https://github.com/rosswilson/honeybadger-node",
           version: "99.99.99"
         },
         error: {
-          backtrace: fakeStackTrace,
           class: "Error",
-          message: "Some fake error"
+          message: "Some fake error",
+          backtrace: fakeStackTrace
         },
-        request: givenRequestContext,
+        request: fakeRequestContext,
         server: givenServerContext
-      }
-    );
-  });
+      })
+      .reply(201, {
+        id: "a75ff7b5-f79a-4ecf-a7bb-1544524d0c18"
+      });
 
-  it("should log an error if the API key is not configured", async () => {
-    const { notify } = createReporter({
-      ...givenOptions,
-      apiKey: undefined
-    });
+    const { notify } = createReporter(givenOptions);
 
-    const fakeError = new Error("Some fake error");
+    await notify(fakeError, fakeRequestContext);
 
-    await notify(fakeError);
-
-    expect(logger.error).toHaveBeenCalledWith(
-      "Unable to report error to Honeybadger: API key must be set"
-    );
+    expect(endpointScope.isDone()).toBeTruthy();
   });
 });

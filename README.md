@@ -30,7 +30,13 @@ try {
   someFunctionThatMightThrow();
 } catch (error) {
   honeybadger.notify(error, {
-    flow: "user-registration"
+    url: "",
+    params: {},
+    session: {},
+    cgi_data: {},
+    context: {
+      flow: "user-registration"
+    }
   });
 }
 ```

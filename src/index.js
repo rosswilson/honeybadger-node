@@ -1,4 +1,5 @@
 const backend = require("./backend");
+const stacktrace = require("./stacktrace");
 const logger = require("./logger");
 const { version } = require("../package.json");
 
@@ -25,7 +26,11 @@ async function notify(error, requestContext) {
       url: "https://github.com/rosswilson/honeybadger-node",
       version
     },
-    error: error.toString(),
+    error: {
+      class: error.name || "Error",
+      message: error.message,
+      backtrace: stacktrace.build(error)
+    },
     request: requestContext,
     server: this.options.serverContext
   };
