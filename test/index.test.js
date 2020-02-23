@@ -1,5 +1,8 @@
 const nock = require("nock");
 const createReporter = require("../src/index");
+const logger = require("../src/logger");
+
+jest.mock("../src/logger");
 
 describe("index", () => {
   const givenApiKey = "someApiKey";
@@ -35,7 +38,7 @@ describe("index", () => {
         context: fakeContext
       })
       .reply(200, {
-        status: "ok"
+        id: "a75ff7b5-f79a-4ecf-a7bb-1544524d0c18"
       });
 
     const { notify } = createReporter(givenOptions);
@@ -43,5 +46,20 @@ describe("index", () => {
     await notify(fakeError, fakeContext);
 
     expect(endpointScope.isDone()).toBeTruthy();
+  });
+
+  it("should log an error if the API key is not configured", async () => {
+    const { notify } = createReporter({
+      ...givenOptions,
+      apiKey: undefined
+    });
+
+    const fakeError = new Error("Some fake error");
+
+    await notify(fakeError);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      "Unable to report error to Honeybadger: API key must be set"
+    );
   });
 });

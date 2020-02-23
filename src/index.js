@@ -29,7 +29,7 @@ async function notify(error, context) {
 
     logger.info("Successfully reported error to Honeybadger");
   } catch (error) {
-    logger.error("Unable to report error to Honeybadger", error);
+    logger.error(`Unable to report error to Honeybadger: ${error.message}`);
   }
 }
 
