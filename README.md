@@ -40,3 +40,18 @@ try {
   });
 }
 ```
+
+## Testing
+
+[GitHub Actions](https://github.com/rosswilson/honeybadger-node/actions?query=branch%3Amaster) is configured to run
+unit and integration tests.
+
+Tests run against all Active LTS or Current Node versions (check the [current status](https://nodejs.org/en/about/releases/)):
+
+- `10.x`
+- `12.x`
+- `13.x`
+
+## Author
+
+Ross Wilson
