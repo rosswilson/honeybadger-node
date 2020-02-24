@@ -4,13 +4,12 @@ function build(error) {
   const rawStacktrace = stackTrace.parse(error);
 
   return rawStacktrace.map(row => {
-    const { functionName, lineNumber, columnNumber, fileName } = row;
+    const { functionName, lineNumber, fileName } = row;
 
     return {
-      functionName,
-      lineNumber,
-      columnNumber,
-      fileName
+      method: functionName,
+      number: lineNumber,
+      file: fileName
     };
   });
 }

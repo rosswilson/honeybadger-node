@@ -8,13 +8,11 @@ describe("stacktrace", () => {
     {
       functionName: "someFunctionName",
       lineNumber: "someLineNumber",
-      columnNumber: "someColumnNumber",
       fileName: "someFileName"
     },
     {
       functionName: "someFunctionName",
       lineNumber: "someLineNumber",
-      columnNumber: "someColumnNumber",
       fileName: "someFileName"
     }
   ]);
@@ -27,16 +25,14 @@ describe("stacktrace", () => {
 
       expect(result).toEqual([
         {
-          functionName: "someFunctionName",
-          lineNumber: "someLineNumber",
-          columnNumber: "someColumnNumber",
-          fileName: "someFileName"
+          method: "someFunctionName",
+          number: "someLineNumber",
+          file: "someFileName"
         },
         {
-          functionName: "someFunctionName",
-          lineNumber: "someLineNumber",
-          columnNumber: "someColumnNumber",
-          fileName: "someFileName"
+          method: "someFunctionName",
+          number: "someLineNumber",
+          file: "someFileName"
         }
       ]);
     });
